@@ -16,3 +16,20 @@ This project demonstrates complete Devops workflow:
 - Kubernetes
 - Helm Jenkins
 
+# Apllcation Overview
+
+This is Java Maven eb Application packaged as a JAR file.
+
+The application runs on port *8080*
+
+## Docker Setup
+
+The project uses a muliti-stage Docker build:
+
+- Maven builds the application into a JAR file
+- Amazon Corretto JRE runs the packaged JAR file.
+
+### Build Docker Image
+
+docker build -t java-maven-app:latest .
+
