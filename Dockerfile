@@ -21,4 +21,4 @@ COPY --from=build /app/target/java-maven-app-*.jar app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", -"jar", jar.app]
+ENTRYPOINT ["java", "-jar", "app.jar"]
