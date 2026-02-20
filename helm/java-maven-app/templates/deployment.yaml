@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "java-maven-app.appName" . }}
+  namespace: {{ include "java-maven-app.namespace" . }}
+  labels:
+    app: {{ include "java-maven-app.appName" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "java-maven-app.appName" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "java-maven-app.appName" . }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ include "java-maven-app.appName" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.containerPort }}
+          resources:
+{{ toYaml .Values.resources | nindent 12 }}

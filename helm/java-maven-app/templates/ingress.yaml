@@ -1,0 +1,24 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "java-maven-app.appName" . }}-ingress
+  namespace: {{ include "java-maven-app.namespace" . }}
+  annotations:
+{{ toYaml .Values.ingress.annotations | indent 4 }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+    - {{- if .Values.ingress.host }}
+      host: {{ .Values.ingress.host | quote }}
+      {{- end }}
+      http:
+        paths:
+          - path: {{ .Values.ingress.path }}
+            pathType: {{ .Values.ingress.pathType }}
+            backend:
+              service:
+                name: {{ include "java-maven-app.appName" . }}-service
+                port:
+                  number: {{ .Values.service.port }}
+{{- end }}
