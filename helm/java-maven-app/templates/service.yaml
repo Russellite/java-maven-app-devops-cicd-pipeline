@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "java-maven-app.appName" . }}-service
+  namespace: {{ include "java-maven-app.namespace" . }}
+spec:
+  selector:
+    app: {{ include "java-maven-app.appName" . }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
