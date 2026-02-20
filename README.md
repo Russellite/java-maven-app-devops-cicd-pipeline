@@ -75,3 +75,43 @@ Cluster deployed on:
 
 Ingress controller exposed via NodePort (since LoadBalancer is not available on bare metal).
 
+### Helm Deployment
+
+The application is packaged using a custom Helm chart located under:
+
+helm/java-maven-app
+
+helm/java-maven-app/
+│
+├── Chart.yaml
+├── values.yaml
+└── templates/
+    ├── deployment.yaml
+    ├── service.yaml
+    ├── hpa.yaml
+    ├── ingress.yaml
+    └── _helpers.tpl
+
+#### Install / Upgrade with Helm
+
+Render templates:
+
+helm template java-app-maven helm/java-maven-app -n test
+
+Deploy or upgrade:
+
+helm upgrade --install java-app-maven helm/java-maven-app \
+  -n test --create-namespace \
+  --set image.repository=giftedition/java-maven-app \
+  --set image.tag=5
+
+Migration to Helm
+
+Initially, the application was deployed using raw Kubernetes manifests via:
+
+kubectl apply -f k8s/
+
+The deployment was later migrated to Helm for better versioning, templating, and CI/CD automation.
+
+Raw manifests remain in the k8s/ directory for reference.
+
