@@ -1,86 +1,114 @@
-# Java-Maven-App devops CI/CD Pipeline
+🚀 Java Maven DevOps CI/CD Pipeline
 
-This project demonstrates complete Devops workflow:
+This project demonstrates an end-to-end DevOps workflow for a Java Maven application deployed to a Kubernetes cluster using Helm and automated via Jenkins.
 
-- Docker containerization
-- Kubernetes deployment
-- Helm packaging
-- Jenkins CI/CD
-- Horizontal Pod Autoscaling
+It covers:
 
+Docker containerization (multi-stage build)
 
-## Tech Stack
+Kubernetes deployment (Deployment, Service, HPA, Ingress)
 
-- Java (Maven)
-- Docker
-- Kubernetes
-- Helm Jenkins
+Helm-based application packaging
 
-# Application Overview
+Jenkins CI/CD automation
 
-This is Java Maven eb Application packaged as a JAR file.
+Bare-metal Kubernetes cluster (DigitalOcean)
 
-The application runs on port *8080*
+Immutable image tagging using build numbers
 
-## Docker Setup
+🧰 Tech Stack
 
-The project uses a muliti-stage Docker build:
+Java (Maven)
 
-- Maven builds the application into a JAR file
-- Amazon Corretto JRE runs the packaged JAR file.
+Docker
 
-### Build Docker Image
+Kubernetes
 
+Helm
+
+Jenkins
+
+DockerHub
+
+DigitalOcean (Bare-metal cluster)
+
+🖥 Application Overview
+
+This is a Java Maven web application packaged as a JAR file.
+
+Application Port: 8080
+
+Built using Maven
+
+Served via NGINX Ingress
+
+🐳 Docker Setup
+
+The project uses a multi-stage Docker build:
+
+Maven builds the application into a JAR file
+
+Amazon Corretto JRE runs the packaged JAR
+
+🔨 Build Docker Image
 docker build -t java-maven-app:latest .
+☸ Kubernetes Deployment
 
-###
+The application is deployed to a Kubernetes cluster with the following components:
 
-Deployment:
+📦 Deployment
 
 CPU requests and limits defined
 
 Container port: 8080
 
-Service
+Managed via Helm
+
+🔌 Service
 
 Type: ClusterIP
 
-Exposes port 80 → container 8080
+Exposes port 80 → container port 8080
 
-HPA
+📈 Horizontal Pod Autoscaler (HPA)
 
 CPU-based autoscaling
 
-Min replicas: 1
+Minimum replicas: 1
 
-Max replicas: 5
+Maximum replicas: 5
 
-Ingress
+🌐 Ingress
 
 NGINX Ingress Controller
 
-Exposed via NodePort on worker node
+Exposed via NodePort (bare-metal setup)
 
-Accessed via:
+Accessible via:
 
 http://<worker-node-public-ip>:<nodeport>
 
-Bare-Metal Setup
 
-Cluster deployed on:
+🏗 Bare-Metal Cluster Setup
 
-1 Control Plane (DigitalOcean Droplet)
+The Kubernetes cluster is deployed on DigitalOcean droplets:
 
-1 Worker Node (DigitalOcean Droplet)
+1 Control Plane Node
 
-Ingress controller exposed via NodePort (since LoadBalancer is not available on bare metal).
+1 Worker Node
 
-### Helm Deployment
+Since this is a bare-metal setup:
+
+LoadBalancer service type is not available
+
+Ingress Controller is exposed via NodePort
+
+📦 Helm Deployment
 
 The application is packaged using a custom Helm chart located under:
 
 helm/java-maven-app
-
+📂 Helm Chart Structure
 helm/java-maven-app/
 │
 ├── Chart.yaml
@@ -92,26 +120,121 @@ helm/java-maven-app/
     ├── ingress.yaml
     └── _helpers.tpl
 
-#### Install / Upgrade with Helm
+🔧 Jenkins Shared Library
 
-Render templates:
+Reusable pipeline functions:
 
+buildImage()
+
+dockerLogin()
+
+dockerPush()
+
+This separates CI logic from orchestration and promotes scalable, maintainable pipelines.
+
+🔍 Render Templates
 helm template java-app-maven helm/java-maven-app -n test
 
-Deploy or upgrade:
-
+🚀 Install / Upgrade
 helm upgrade --install java-app-maven helm/java-maven-app \
   -n test --create-namespace \
   --set image.repository=giftedition/java-maven-app \
-  --set image.tag=5
+  --set image.tag=<BUILD_NUMBER>
 
-Migration to Helm
+Helm provides:
 
-Initially, the application was deployed using raw Kubernetes manifests via:
+Versioned releases
+
+Easier upgrades
+
+Rollback capability
+
+Clean parameterization
+
+CI/CD-friendly deployment
+
+🔄 Migration to Helm
+
+Initially, the application was deployed using raw Kubernetes manifests:
 
 kubectl apply -f k8s/
 
-The deployment was later migrated to Helm for better versioning, templating, and CI/CD automation.
+The deployment was later migrated to Helm for:
+
+Better release management
+
+Templating flexibility
+
+CI/CD integration
+
+Version tracking
 
 Raw manifests remain in the k8s/ directory for reference.
 
+🔁 CI/CD Pipeline
+
+The Jenkins pipeline automates:
+
+Docker image build
+
+DockerHub push
+
+Helm deployment
+
+Kubernetes rollout verification
+
+Deployment command used in Jenkins:
+
+helm upgrade --install java-app-maven helm/java-maven-app \
+  -n test \
+  --set image.repository=giftedition/java-maven-app \
+  --set image.tag=${BUILD_NUMBER}
+
+Each build generates an immutable image tag based on the Jenkins build number.
+
+📊 Release Management
+
+List Helm releases:
+
+helm ls -n test
+
+Check release status:
+
+helm status java-app-maven -n test
+
+Rollback to previous revision:
+
+helm rollback java-app-maven <REVISION> -n test
+
+
+🏆 Key DevOps Concepts Demonstrated
+
+Multi-stage Docker builds
+
+Container registry integration (DockerHub)
+
+Bare-metal Kubernetes architecture
+
+Ingress configuration without cloud LoadBalancer
+
+Horizontal Pod Autoscaling
+
+Helm-based deployment packaging
+
+Immutable image versioning
+
+CI/CD automation with Jenkins
+
+Release management and rollback with Helm
+
+📈 Future Improvements
+
+TLS configuration for Ingress
+
+Helm chart versioning strategy
+
+Automated rollback on deployment failure
+
+Multi-environment support (dev/staging/prod)
+
+Monitoring & logging integration (Prometheus/Grafana)
